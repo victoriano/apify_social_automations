@@ -1,0 +1,92 @@
+# .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.log
+*.csv
+*.json
+*.jsonl
+*.txt
+*.xml
+*.html
+*.zip
+*.tar.gz
+*.tgz
+*.tar
+*.pickle
+*.pkl
+*.gz
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+*.pdf
+*.rtf
+*.odt
+*.ods
+*.odp
+*.eot
+*.ttf
+*.woff
+*.woff2
+*.otf
+*.psd
+*.ai
+*.indd
+*.accdb
+*.pub
+*.pages
+*.numbers
+*.key
+
+# Directories
+bin/
+include/
+lib/
+lib64/
+share/
+pyvenv.cfg
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.vscode/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment variables
+.env
+
+# Django
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media
+
+# Flask
+instance/
+.webassets-cache
+
+# Scrapy
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/

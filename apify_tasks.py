@@ -1,0 +1,97 @@
+import requests
+from dotenv import load_dotenv
+import os
+
+def get_apify_tasks(api_token):
+    url = "https://api.apify.com/v2/actor-tasks"
+    headers = {
+        "Authorization": f"Bearer {api_token}",
+        "Content-Type": "application/json",
+    }
+    response = requests.get(url, headers=headers)
+    tasks = response.json()
+
+    # Extract required fields and add to a new list
+    tasks_list = []
+    for task in tasks['data']['items']:
+        task_info = {
+            'id': task['id'],
+            'name': task['name'],
+            'createdAt': task['createdAt'],
+            'totalRuns': task['stats']['totalRuns'] if 'totalRuns' in task['stats'] else 0,
+            'lastRunStartedAt': task['stats']['lastRunStartedAt'] if 'lastRunStartedAt' in task['stats'] else None
+        }
+        tasks_list.append(task_info)
+
+    # Sort the list by 'lastRunStartedAt' in descending order
+    tasks_list.sort(key=lambda x: x['lastRunStartedAt'] if x['lastRunStartedAt'] is not None else '', reverse=True)
+    return tasks_list
+
+def count_apify_tasks(api_token):
+    tasks = get_apify_tasks(api_token)
+    return len(tasks)
+
+def get_apify_runs(api_token, task_id):
+    task_id = task_id.replace("/", "~")
+    url = f"https://api.apify.com/v2/actor-tasks/{task_id}/runs"
+    headers = {
+        "Authorization": f"Bearer {api_token}",
+        "Content-Type": "application/json",
+    }
+    response = requests.get(url, headers=headers)
+    runs = response.json()
+    if 'error' in runs:
+        return runs['error']['message']
+    return runs['data']['items']
+
+def extract_apify_runs_datasets_ids(runs):
+    if isinstance(runs, str):
+        print(f"Error in get_apify_runs: {runs}")
+        return []
+    result = []
+    for run in runs:
+        data = {
+            'startedAt': run['startedAt'],
+            'defaultDatasetId': run['defaultDatasetId']
+        }
+        result.append(data)
+    return result
+
+def download_apify_dataset(api_token, dataset_id, task_name='default_task', format='json'):
+    file_path = os.path.join('datasets', task_name)
+    if not os.path.exists(file_path):
+        os.makedirs(file_path)
+    url = f"https://api.apify.com/v2/datasets/{dataset_id}/items?token={api_token}&format={format}"
+    headers = {
+        "Authorization": f"Bearer {api_token}",
+        "Content-Type": "application/json",
+    }
+    response = requests.get(url, headers=headers, stream=True)
+    
+    if response.status_code == 200:
+        with open(os.path.join(file_path, f'{dataset_id}.{format}'), 'wb') as f:
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+        print(f"File downloaded at {os.path.join(file_path, f'{dataset_id}.{format}')}")
+    else:
+        print("Error occurred while downloading file.")
+
+def download_all_datasets_for_task(api_token, task_id, format='json'):
+    # Get all runs for the task
+    runs = get_apify_runs(api_token, task_id)
+    # Extract dataset ids from the runs
+    datasets = extract_apify_runs_datasets_ids(runs)
+    # Download each dataset
+    for dataset in datasets:
+        download_apify_dataset(api_token, dataset['defaultDatasetId'], task_name=task_id, format=format)
+
+
+if __name__ == "__main__":
+
+    load_dotenv()
+    api_token = os.getenv("API_TOKEN")
+    
+    print(api_token)
+
+
