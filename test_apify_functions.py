@@ -9,8 +9,8 @@ api_token = os.getenv("API_TOKEN")
 
 #Some IDs to test functions
 dataset_id = "cYEYHZoRfZuwychN7"
-#task_id = "datasets/graphext~scrape-spanish-media"
-task_id = "graphext~scrape-train-tweets"
+task_id = "datasets/graphext~scrape-spanish-media"
+#task_id = "graphext/scrape-train-tweets"
 
 #Print All Saved Tasks by last run started at
 #tasks = get_apify_tasks(api_token)
@@ -25,4 +25,4 @@ task_id = "graphext~scrape-train-tweets"
 #download_apify_dataset(api_token, last_dataset_id, format="csv")
 
 #download_all_datasets_for_task(api_token, task_id, format='csv')
-merge_files_in_folder('datasets/graphext~scrape-train-tweets', output_format='json')
+merge_files_in_folder(task_id, output_format='csv')
