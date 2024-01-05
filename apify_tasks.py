@@ -1,6 +1,6 @@
 import requests
 import os
-from data_utils import merge_files_in_folder
+from data_utils import merge_files_in_folder, remove_duplicates_from_file
 
 def get_apify_tasks(api_token):
     url = "https://api.apify.com/v2/actor-tasks"
@@ -86,7 +86,11 @@ def download_all_datasets_for_task(api_token, task_id, format='json'):
     for dataset in datasets:
         download_apify_dataset(api_token, dataset['defaultDatasetId'], task_name=task_id, format=format)
 
-def merge_task_datasets(task_id, output_format='json'):
+def merge_task_datasets(task_id, output_format='json', remove_duplicates=False, subset=None):
     task_id = task_id.replace("/", "~")
     folder_path = os.path.join('datasets', task_id)
     merge_files_in_folder(folder_path, output_format)
+
+    if remove_duplicates:
+        merged_file_path = os.path.join(folder_path, f'merged_data.{output_format}')
+        remove_duplicates_from_file(merged_file_path, subset=subset, file_format=output_format)

@@ -32,6 +32,24 @@ def json_to_csv(json_file_path, csv_file_path):
     df.to_csv(csv_file_path, index=False)
     print(f"Converted {json_file_path} to {csv_file_path}")
 
+def remove_duplicates_from_file(file_path, subset=None, file_format='csv'):
+    if file_format == 'csv':
+        df = pd.read_csv(file_path)
+    elif file_format == 'json':
+        df = pd.read_json(file_path, lines=True)
+    else:
+        print(f"Unsupported file format: {file_format}")
+        return
+
+    df.drop_duplicates(subset=subset, keep='first', inplace=True)
+
+    if file_format == 'csv':
+        df.to_csv(file_path, index=False)
+    elif file_format == 'json':
+        df.to_json(file_path, orient='records', lines=True)
+
+    print(f"Duplicates removed from {file_path}")
+
 def infer_file_format(folder_path):
     files = os.listdir(folder_path)
     for file in files:

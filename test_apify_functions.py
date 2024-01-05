@@ -26,4 +26,5 @@ task_id = "graphext/scrape-train-tweets"
 #download_apify_dataset(api_token, last_dataset_id, format="csv")
 
 #download_all_datasets_for_task(api_token, task_id, format='json')
-merge_task_datasets(task_id, output_format='csv')
+#merge_task_datasets(task_id, output_format='csv', remove_duplicates=True)
+#merge_task_datasets(task_id, output_format='csv', remove_duplicates=True, subset=['text'])
