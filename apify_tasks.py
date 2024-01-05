@@ -1,6 +1,6 @@
 import requests
-from dotenv import load_dotenv
 import os
+from data_utils import merge_files_in_folder
 
 def get_apify_tasks(api_token):
     url = "https://api.apify.com/v2/actor-tasks"
@@ -86,12 +86,7 @@ def download_all_datasets_for_task(api_token, task_id, format='json'):
     for dataset in datasets:
         download_apify_dataset(api_token, dataset['defaultDatasetId'], task_name=task_id, format=format)
 
-
-if __name__ == "__main__":
-
-    load_dotenv()
-    api_token = os.getenv("API_TOKEN")
-    
-    print(api_token)
-
-
+def merge_task_datasets(task_id, output_format='json'):
+    task_id = task_id.replace("/", "~")
+    folder_path = os.path.join('datasets', task_id)
+    merge_files_in_folder(folder_path, output_format)
