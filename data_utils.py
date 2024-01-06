@@ -59,7 +59,7 @@ def infer_file_format(folder_path):
             return 'csv'
     return None
 
-def merge_files_in_folder(folder_path, output_format='json'):
+def merge_files_in_folder(folder_path, output_file_name, output_format='json'):
     input_format = infer_file_format(folder_path)
     if input_format is None:
         print("No json or csv files found in the folder.")
@@ -67,19 +67,14 @@ def merge_files_in_folder(folder_path, output_format='json'):
 
     if input_format == 'json':
         merged_data = merge_json_files(folder_path)
-        if output_format == 'json':
-            output_file = os.path.join(folder_path, 'merged_data.json')
-            merged_data.to_json(output_file, orient='records', lines=True)
-        elif output_format == 'csv':
-            output_file = os.path.join(folder_path, 'merged_data.csv')
-            merged_data.to_csv(output_file, index=False)
+        output_file = os.path.join(folder_path, f'{output_file_name}.{output_format}')
     elif input_format == 'csv':
         merged_data = merge_csv_files(folder_path)
-        if output_format == 'csv':
-            output_file = os.path.join(folder_path, 'merged_data.csv')
-            merged_data.to_csv(output_file, index=False)
-        elif output_format == 'json':
-            output_file = os.path.join(folder_path, 'merged_data.json')
-            merged_data.to_json(output_file, orient='records', lines=True)
+        output_file = os.path.join(folder_path, f'{output_file_name}.{output_format}')
+
+    if output_format == 'json':
+        merged_data.to_json(output_file, orient='records', lines=True)
+    elif output_format == 'csv':
+        merged_data.to_csv(output_file, index=False)
 
     print(f"Merged file created at {output_file}")

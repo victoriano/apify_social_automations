@@ -1,8 +1,9 @@
+import os
 import pandas as pd
 import snowflake.connector
 from snowflake.connector.pandas_tools import write_pandas
 
-def create_table_from_csv(conn_info, table_name, csv_path):
+def create_table_from_csv(conn_info, csv_path, table_name=None):
     # Connect to Snowflake
     conn = snowflake.connector.connect(
         user=conn_info['user'],
@@ -15,6 +16,9 @@ def create_table_from_csv(conn_info, table_name, csv_path):
     )
     # Read CSV file with pandas
     df = pd.read_csv(csv_path)
+    # If table_name is not provided, use the base name of the CSV file
+    if table_name is None:
+        table_name = os.path.splitext(os.path.basename(csv_path))[0]
     # Use the write_pandas function to write the DataFrame to Snowflake
     success, nchunks, nrows, _ = write_pandas(conn, df, table_name, database=conn_info['database'], schema=conn_info['schema'], auto_create_table=True)
     # Close the connection

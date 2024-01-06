@@ -2,6 +2,22 @@ import requests
 import os
 from data_utils import merge_files_in_folder, remove_duplicates_from_file
 
+def get_task_table_name(task_id):
+    task_id = task_id.replace("/", "~")
+    task_name = task_id.split("~")[-1].replace("-", "_")
+    return task_name
+
+def get_task_datasets_path(task_id):
+    task_id = task_id.replace("/", "~")
+    datasets_path = os.path.join('datasets', task_id)
+    return datasets_path
+
+def get_task_merged_file_path(task_id, output_format='csv'):
+    datasets_path = get_task_datasets_path(task_id)
+    task_name = get_task_table_name(task_id) + f".{output_format}"
+    file_path = os.path.join(datasets_path, task_name)
+    return file_path
+
 def get_apify_tasks(api_token):
     url = "https://api.apify.com/v2/actor-tasks"
     headers = {
@@ -57,8 +73,8 @@ def extract_apify_runs_datasets_ids(runs):
         result.append(data)
     return result
 
-def download_apify_dataset(api_token, dataset_id, task_name='default_task', format='json'):
-    file_path = os.path.join('datasets', task_name)
+def download_apify_dataset(api_token, dataset_id, task_id, format='json'):
+    file_path = get_task_datasets_path(task_id)
     if not os.path.exists(file_path):
         os.makedirs(file_path)
     url = f"https://api.apify.com/v2/datasets/{dataset_id}/items?token={api_token}&format={format}"
@@ -84,13 +100,14 @@ def download_all_datasets_for_task(api_token, task_id, format='json'):
     datasets = extract_apify_runs_datasets_ids(runs)
     # Download each dataset
     for dataset in datasets:
-        download_apify_dataset(api_token, dataset['defaultDatasetId'], task_name=task_id, format=format)
+        download_apify_dataset(api_token, dataset['defaultDatasetId'], task_id, format=format)
 
-def merge_task_datasets(task_id, output_format='json', remove_duplicates=False, subset=None):
+def merge_task_datasets(task_id, output_format='csv', remove_duplicates=False, subset=None):
     task_id = task_id.replace("/", "~")
     folder_path = os.path.join('datasets', task_id)
-    merge_files_in_folder(folder_path, output_format)
+    output_file_name = get_task_table_name(task_id)
+    merge_files_in_folder(folder_path, output_file_name, output_format)
 
     if remove_duplicates:
-        merged_file_path = os.path.join(folder_path, f'merged_data.{output_format}')
+        merged_file_path = get_task_merged_file_path(task_id, output_format)
         remove_duplicates_from_file(merged_file_path, subset=subset, file_format=output_format)
