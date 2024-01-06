@@ -1,5 +1,5 @@
 from apify_tasks import get_apify_tasks, download_apify_dataset, merge_task_datasets, get_apify_runs, extract_apify_runs_datasets_ids, download_all_datasets_for_task
-from snowflake_utils import create_table_from_csv
+from snowflake_utils import create_table_from_csv, remove_duplicates
 
 from dotenv import load_dotenv
 import os
@@ -46,6 +46,5 @@ csv_path = 'datasets/graphext~scrape-train-tweets/merged_data.csv'
 # Name of the table you want to create
 table_name = 'merged_data'
 # Call the function
-success, nchunks, nrows = create_table_from_csv(conn_info, table_name, csv_path)
-# Print the result
-print(f'Success: {success}, Chunks: {nchunks}, Rows: {nrows}')
+#create_table_from_csv(conn_info, table_name, csv_path)
+remove_duplicates(conn_info, table_name)
