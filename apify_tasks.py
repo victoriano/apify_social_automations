@@ -43,6 +43,30 @@ def get_apify_tasks(api_token):
     tasks_list.sort(key=lambda x: x['lastRunStartedAt'] if x['lastRunStartedAt'] is not None else '', reverse=True)
     return tasks_list
 
+def run_tweet_scraper_actor(api_token, search_terms, actor_name='apidojo/tweet-scraper'):
+    url = f"https://api.apify.com/v2/actor-tasks/{actor_name}/runs?token={api_token}"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_token}"
+    }
+    payload = {
+        "includeSearchTerms": False,
+        "onlyImage": False,
+        "onlyQuote": False,
+        "onlyTwitterBlue": False,
+        "onlyVerifiedUsers": False,
+        "onlyVideo": False,
+        "searchTerms": search_terms,
+        "sort": "Latest"
+    }
+    
+    response = requests.post(url, headers=headers, data=json.dumps(payload))
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return response.text
+    
 def count_apify_tasks(api_token):
     tasks = get_apify_tasks(api_token)
     return len(tasks)

@@ -3,6 +3,7 @@ import pandas as pd
 import snowflake.connector
 from snowflake.connector.pandas_tools import write_pandas
 
+
 def create_table_from_csv(conn_info, csv_path, table_name=None):
     # Connect to Snowflake
     conn = snowflake.connector.connect(
